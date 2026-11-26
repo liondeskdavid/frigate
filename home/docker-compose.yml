@@ -1,6 +1,11 @@
 # Anderson home Frigate stack (Windows PC / Docker Desktop).
-# Run from this directory: docker compose up -d
-# UI: http://localhost:5000  (unauthenticated local) or https://localhost:8971
+# Local:  docker compose up -d
+# Tunnel: docker compose --profile tunnel up -d   (needs CLOUDFLARE_TUNNEL_TOKEN)
+# Remote access guide: REMOTE-ACCESS.md
+#
+# UI:
+#   http://localhost:5000  — unauthenticated (PC/LAN only; never tunnel this)
+#   http://localhost:8971  — authenticated admin UI (tunnel / reverse-proxy target)
 
 services:
   mqtt:
@@ -31,18 +36,31 @@ services:
         tmpfs:
           size: 1000000000
     ports:
-      - "5000:5000"     # Local unauthenticated UI (LAN only; prefer 8971 remotely)
-      - "8971:8971"     # Authenticated UI / API
-      - "8554:8554"     # go2rtc RTSP restream
-      - "8555:8555/tcp" # WebRTC TCP
-      - "8555:8555/udp" # WebRTC UDP
-      - "1984:1984"     # go2rtc API / web UI
+      - "5000:5000"     # Unauthenticated — local only; do not put behind Cloudflare
+      - "8971:8971"     # Authenticated UI/API — Cloudflare Tunnel origin
+      - "8554:8554"     # go2rtc RTSP restream (LAN)
+      - "8555:8555/tcp" # WebRTC TCP (LAN)
+      - "8555:8555/udp" # WebRTC UDP (LAN)
+      - "1984:1984"     # go2rtc API/UI (LAN only)
     environment:
       TZ: ${TZ:-America/Denver}
-      # Optional: referenced in config as {FRIGATE_RTSP_PASSWORD} for camera RTSP auth
       FRIGATE_RTSP_PASSWORD: ${FRIGATE_RTSP_PASSWORD:-changeme}
-      # Plus API (optional)
       PLUS_API_KEY: ${PLUS_API_KEY:-}
+
+  # Optional: Cloudflare Tunnel inside Compose.
+  # Prefer native Windows cloudflared (see REMOTE-ACCESS.md) unless you want everything in Docker.
+  # Dashboard Public Hostname URL must be http://frigate:8971 when using this profile.
+  cloudflared:
+    profiles: ["tunnel"]
+    container_name: anderson-cloudflared
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    depends_on:
+      - frigate
+    # Set CLOUDFLARE_TUNNEL_TOKEN in .env before: docker compose --profile tunnel up -d
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    command: tunnel --no-autoupdate run
 
 volumes:
   mqtt_data:

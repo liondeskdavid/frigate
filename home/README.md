@@ -22,10 +22,23 @@ Wait ~30–60s for the first image pull, then open:
 
 | URL | Purpose |
 | --- | --- |
-| http://localhost:5000 | Local Frigate UI (unauthenticated; LAN use) |
-| https://localhost:8971 | Authenticated UI / API (accept self-signed cert) |
-| http://localhost:1984 | go2rtc web UI |
+| http://localhost:5000 | Local Frigate UI (**unauthenticated** — PC/LAN only; never tunnel) |
+| http://localhost:8971 | Authenticated admin UI / API (**use this for remote / Cloudflare Tunnel**) |
+| http://localhost:1984 | go2rtc web UI (LAN) |
 | mqtt://localhost:1883 | Mosquitto (no auth in this scaffold) |
+
+Set the Frigate **admin** password in the UI (Settings → Users) on port 8971.
+
+### Remote access (Cloudflare Tunnel)
+
+Full Windows steps: **[REMOTE-ACCESS.md](REMOTE-ACCESS.md)**.
+
+Summary: Cloudflare Tunnel → `localhost:8971` → HTTPS hostname → set hub `NEXT_PUBLIC_FRIGATE_URL` on Vercel. Optional Compose profile:
+
+```powershell
+# after CLOUDFLARE_TUNNEL_TOKEN is in .env and the dashboard origin is http://frigate:8971
+docker compose --profile tunnel up -d
+```
 
 Check health:
 
@@ -107,8 +120,16 @@ cameras:
 
 The family hub Security page (`/security`) explains stack status and links to Frigate when available.
 
-- **Same PC / LAN:** set hub env `NEXT_PUBLIC_FRIGATE_URL=http://localhost:5000` (or your PC’s LAN IP, e.g. `http://192.168.x.x:5000`).
-- **Remote hub → home Frigate:** Frigate is not public. Use a VPN, Tailscale, or reverse proxy with auth, then set `NEXT_PUBLIC_FRIGATE_URL` to that reachable HTTPS URL. Do not expose port 5000 to the internet without authentication (prefer 8971 + TLS).
+1. Follow **[REMOTE-ACCESS.md](REMOTE-ACCESS.md)** (Cloudflare Tunnel to **8971**).
+2. On Vercel (`clarus-holdings/andersonfamily-ai`), set:
+
+```bash
+NEXT_PUBLIC_FRIGATE_URL=https://frigate.yourdomain.com
+```
+
+3. Redeploy the hub. Signed-in users get **Open Frigate UI** on `/security`.
+
+Never point the hub at port 5000 over the internet. Tailscale to `:8971` is a VPN-only alternative (see REMOTE-ACCESS.md).
 
 ## Troubleshooting
 

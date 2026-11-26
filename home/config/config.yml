@@ -1,6 +1,11 @@
 # Anderson family Frigate config — placeholders until real cameras arrive.
 # Docs: https://docs.frigate.video/configuration/
-# Replace PLACEHOLDER_* values; do not invent camera IPs.
+# Remote access: ../REMOTE-ACCESS.md (Cloudflare Tunnel → port 8971)
+# Replace PLACEHOLDER_* / CAMERA_IP values; do not invent camera IPs.
+
+# JWT auth on port 8971 (reverse proxies / Cloudflare Tunnel must use 8971, never 5000).
+auth:
+  enabled: true
 
 mqtt:
   enabled: true
@@ -8,8 +13,12 @@ mqtt:
   port: 1883
 
 # Built-in go2rtc (restream / WebRTC). Streams stay empty until cameras exist.
+# Remote live view goes through the authenticated UI (MSE). Keep 8555 on LAN only.
 go2rtc:
   streams: {}
+  webrtc:
+    candidates:
+      - stun:8555
   # Example when a camera is ready (uncomment and fill real RTSP):
   # streams:
   #   front_porch:
@@ -75,7 +84,6 @@ cameras:
           roles:
             - detect
 
-# Optional: birdseye overview when cameras are online
 birdseye:
   enabled: false
   mode: objects
