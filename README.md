@@ -27,6 +27,18 @@ Use of a GPU or AI accelerator is highly recommended. AI accelerators will outpe
 - Re-streaming via RTSP to reduce the number of connections to your camera
 - WebRTC & MSE support for low-latency live view
 
+## Anderson home deploy
+
+For David Anderson’s Windows PC stack (Frigate + MQTT, placeholder cameras, no fake live streams), see **[`home/`](home/README.md)**.
+
+```powershell
+cd home
+copy .env.example .env
+docker compose up -d
+```
+
+Then open http://localhost:5000. Details: ports, volumes, env vars, and how to add cameras later are in [`home/README.md`](home/README.md).
+
 ## Documentation
 
 View the documentation at https://docs.frigate.video

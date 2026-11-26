@@ -1,0 +1,81 @@
+# Anderson family Frigate config — placeholders until real cameras arrive.
+# Docs: https://docs.frigate.video/configuration/
+# Replace PLACEHOLDER_* values; do not invent camera IPs.
+
+mqtt:
+  enabled: true
+  host: mqtt
+  port: 1883
+
+# Built-in go2rtc (restream / WebRTC). Streams stay empty until cameras exist.
+go2rtc:
+  streams: {}
+  # Example when a camera is ready (uncomment and fill real RTSP):
+  # streams:
+  #   front_porch:
+  #     - rtsp://viewer:{FRIGATE_RTSP_PASSWORD}@CAMERA_IP:554/Streaming/Channels/101
+  #   front_porch_sub:
+  #     - rtsp://viewer:{FRIGATE_RTSP_PASSWORD}@CAMERA_IP:554/Streaming/Channels/102
+
+detectors:
+  # CPU detector works without Coral/GPU. Swap for coral/openvino later if needed.
+  cpu:
+    type: cpu
+    num_threads: 2
+
+detect:
+  enabled: false
+  width: 1280
+  height: 720
+  fps: 5
+
+record:
+  enabled: false
+  retain:
+    days: 7
+    mode: motion
+
+snapshots:
+  enabled: false
+  retain:
+    default: 14
+
+cameras:
+  # Disabled placeholders — Frigate starts, UI is reachable, no fake live streams.
+  # Set enabled: true and real RTSP paths (or go2rtc restream URLs) when cameras arrive.
+  front_porch:
+    enabled: false
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:554/PLACEHOLDER_FRONT_PORCH
+          roles:
+            - detect
+
+  driveway:
+    enabled: false
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:554/PLACEHOLDER_DRIVEWAY
+          roles:
+            - detect
+
+  backyard:
+    enabled: false
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:554/PLACEHOLDER_BACKYARD
+          roles:
+            - detect
+
+  garage:
+    enabled: false
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:554/PLACEHOLDER_GARAGE
+          roles:
+            - detect
+
+# Optional: birdseye overview when cameras are online
+birdseye:
+  enabled: false
+  mode: objects
