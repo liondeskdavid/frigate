@@ -33,7 +33,7 @@ Set the Frigate **admin** password in the UI (Settings → Users) on port 8971.
 
 Full Windows steps: **[REMOTE-ACCESS.md](REMOTE-ACCESS.md)**.
 
-Summary: Cloudflare Tunnel → `localhost:8971` → HTTPS hostname → set hub `NEXT_PUBLIC_FRIGATE_URL` on Vercel. Optional Compose profile:
+Summary: Cloudflare Tunnel → `localhost:8971` → **https://frigate.andersonfamily.ai** → set hub `NEXT_PUBLIC_FRIGATE_URL` on Vercel. DNS CNAME steps are in REMOTE-ACCESS.md (domain NS currently on GoDaddy). Optional Compose profile:
 
 ```powershell
 # after CLOUDFLARE_TUNNEL_TOKEN is in .env and the dashboard origin is http://frigate:8971
@@ -124,7 +124,7 @@ The family hub Security page (`/security`) explains stack status and links to Fr
 2. On Vercel (`clarus-holdings/andersonfamily-ai`), set:
 
 ```bash
-NEXT_PUBLIC_FRIGATE_URL=https://frigate.yourdomain.com
+NEXT_PUBLIC_FRIGATE_URL=https://frigate.andersonfamily.ai
 ```
 
 3. Redeploy the hub. Signed-in users get **Open Frigate UI** on `/security`.
